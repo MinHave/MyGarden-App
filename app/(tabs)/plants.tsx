@@ -12,22 +12,23 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-} from "react-native";
-import React, { useEffect, useState } from "react";
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { useRouter, useNavigation, useLocalSearchParams } from "expo-router";
-import { ISimplePlant } from "@/types/interfaces";
-import apiService from "@/services/apiService";
-import { RootStackParamList } from "@/navigation";
-import { useIsFocused } from "@react-navigation/native";
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { HelloWave } from '@/components/HelloWave';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { useRouter, useNavigation, useLocalSearchParams } from 'expo-router';
+import { ISimpleGarden, ISimplePlant } from '@/types/interfaces';
+import apiService from '@/services/apiService';
+import { RootStackParamList } from '@/navigation';
+import { useIsFocused } from '@react-navigation/native';
 
 // The main functional component for the Plants Screen
 export default function PlantsList() {
   // State to hold the list of plants
   const [getPlants, setPlants] = useState<ISimplePlant[]>([]);
+  const [getGarden, setGarden] = useState<ISimpleGarden>();
   // Hooks for routing and navigation
   const router = useRouter();
   const navigation = useNavigation();
@@ -41,21 +42,29 @@ export default function PlantsList() {
     onStartup();
   }, [isFocused]);
 
+  useEffect(() => {
+    if (getGarden != undefined) {
+      // fetchGardenData();
+    }
+  }, [setGarden]);
+
   // Function to initialize data fetching
   const onStartup = () => {
     fetchPlants();
+    setGarden(undefined);
   };
 
   // Mock function to fetch plants data
-  function fetchPlants() {
+  async function fetchPlants() {
+    var result = await apiService.getPlants(getGarden?.id);
     // Placeholder for fetching plants data
-    var result: ISimplePlant[] = [{ id: "8y97f-asd12-12asd5", name: "Test 1" }];
+    var result: ISimplePlant[] = [{ id: '8y97f-asd12-12asd5', name: 'Test 1' }];
     setPlants(result);
   }
 
   // Function to handle navigation to plant details
   function plantDetails(plant: ISimplePlant) {
-    navigation.navigate("PlantDetails", {
+    navigation.navigate('PlantDetails', {
       plantId: plant.id,
     });
   }
@@ -72,32 +81,32 @@ export default function PlantsList() {
         <ThemedView>
           <TouchableOpacity
             onPress={() => plantDetails(item)}
-            style={{ flexDirection: "row", height: 90 }}
+            style={{ flexDirection: 'row', height: 90 }}
           >
-            <View style={{ flex: 1, justifyContent: "center" }}>
+            <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text
                 style={{
-                  color: "#ffffff",
+                  color: '#ffffff',
                   fontSize: 18,
-                  textAlign: "center",
+                  textAlign: 'center',
                 }}
               >
                 {item.name}
               </Text>
             </View>
-            <View style={{ flex: 1, justifyContent: "center" }}>
+            <View style={{ flex: 1, justifyContent: 'center' }}>
               <TouchableOpacity
                 onPress={() => plantDetails(item)}
                 style={{
-                  backgroundColor: "#009e73",
+                  backgroundColor: '#009e73',
                   elevation: 0,
                   width: 85,
-                  alignSelf: "center",
+                  alignSelf: 'center',
                   paddingVertical: 8,
                   borderRadius: 4,
                 }}
               >
-                <Text style={{ color: "#fff", textAlign: "center" }}>
+                <Text style={{ color: '#fff', textAlign: 'center' }}>
                   click me
                 </Text>
               </TouchableOpacity>
@@ -130,8 +139,8 @@ export default function PlantsList() {
 // StyleSheet for the component
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   stepContainer: {
@@ -143,6 +152,6 @@ const styles = StyleSheet.create({
     width: 290,
     bottom: 0,
     left: 0,
-    position: "absolute",
+    position: 'absolute',
   },
 });
