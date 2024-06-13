@@ -6,4 +6,5 @@ export interface ICurrentUser {
   email: string;
   phoneNumber: string;
   refreshToken: string;
+  roles: List<T>;
 }

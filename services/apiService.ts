@@ -1,119 +1,100 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
-// import { API_URL } from '@env';
-import { credentials, inOptions } from '@/types/apiService';
-import auth from '@/store/auth';
-import { DateTime } from 'luxon';
-import { ICurrentUser } from '@/store/interfaces/auth';
-import { ISimplePlant } from '@/types/interfaces';
+// Replace with your machine's IP address and port number
+const URL_ENDPOINT = 'https://api.tavsogmatias.com';
 
-const service = {
-  api: 'http://localhost:5000',
-  timeoutTime: 20000,
+const api = axios.create({
+  baseURL: URL_ENDPOINT,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-  async getOptions(inOptions?: inOptions): Promise<any> {
-    if (
-      !inOptions?.noAuth &&
-      auth.currentUser.expires <
-        DateTime.local().setZone('Europe/Copenhagen').toISO()
-    ) {
-      console.log('token expired, refreshing');
-      const getRefreshToken = await auth.refreshToken();
-      const user = await this.refreshAuth(getRefreshToken);
-      await auth.setUser(user);
-    }
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
 
-    const token = auth.authToken();
-    if (!inOptions?.noAuth && token) {
-      return {
-        ...inOptions,
-        timeout: this.timeoutTime,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          ...inOptions?.headers,
-        },
-      };
-    } else {
-      return {
-        ...inOptions,
-        timeout: this.timeoutTime,
-      };
-    }
-  },
+export interface Credentials {
+  username: string;
+  password: string;
+}
 
-  async handleResponse(task: any): Promise<any> {},
-
-  async post(endpoint: string, payload: object | string, options?: inOptions) {
-    return this.handleResponse(
-      axios.post(
-        `${this.api}/${endpoint}`,
-        payload,
-        await this.getOptions(options)
-      )
-    );
-  },
-  postJsonString(
-    endpoint: string,
-    payload: object | string,
-    options: inOptions
-  ) {
-    return this.post(endpoint, JSON.stringify(payload), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      ...options,
-    });
-  },
-  async get(endpoint: string, payload?: object) {
-    return this.handleResponse(
-      axios.get(`${this.api}/${endpoint}`, await this.getOptions(payload))
-    );
-  },
-  async put(endpoint: string, payload: object, options: inOptions) {
-    return this.handleResponse(
-      axios.put(
-        `${this.api}/${endpoint}`,
-        payload,
-        await this.getOptions(options ?? options)
-      )
-    );
-  },
-  async delete(endpoint: string, payload: object) {
-    return this.handleResponse(
-      axios.delete(`${this.api}/${endpoint}`, await this.getOptions(payload))
-    );
-  },
-
-  //#region Endpoints
-
-  //#region Auth
-  login(credentials: credentials) {
-    return this.post('auth/login', credentials, { noAuth: true });
-  },
-  refreshAuth(refreshCode: string): Promise<ICurrentUser> {
-    return this.postJsonString('auth/refresh', refreshCode, { noAuth: true });
-  },
-  changePassword(passwordChanges: string) {
-    return this.post('auth/changePassword', passwordChanges);
-  },
-  resetPassword(username: string) {
-    return this.postJsonString('auth/resetPassword', username, {
-      noAuth: true,
-    });
-  },
-
-  //#endregion Auth
-
-  getPlants(gardenId: string | undefined): Promise<ISimplePlant[]> {
-    return this.get(`plant/gardenPlants/${gardenId}`);
-  },
-  getPlant(id: string) {
-    return this.get(`plant/${id}`);
-  },
-  getGardenList() {
-    return this.get(`garden`);
-  },
-
-  //#endregion Endpoints
+const get = async <T = any>(url: string): Promise<ApiResponse<T>> => {
+  try {
+    console.log(`GET request to: ${url}`);
+    const response: AxiosResponse<T> = await api.get(url);
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error: any) {
+    console.error('GET request error:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
 };
-export default service;
+
+const post = async <T = any>(
+  url: string,
+  data: any
+): Promise<ApiResponse<T>> => {
+  try {
+    console.log(`POST request to: ${url} with data:`, data);
+    const response: AxiosResponse<T> = await api.post(url, data);
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error: any) {
+    console.error('POST request error:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+
+const put = async <T = any>(
+  url: string,
+  data: any
+): Promise<ApiResponse<T>> => {
+  try {
+    console.log(`PUT request to: ${url} with data:`, data);
+    const response: AxiosResponse<T> = await api.put(url, data);
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error: any) {
+    console.error('PUT request error:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+
+const del = async <T = any>(url: string): Promise<ApiResponse<T>> => {
+  try {
+    console.log(`DELETE request to: ${url}`);
+    const response: AxiosResponse<T> = await api.delete(url);
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error: any) {
+    console.error('DELETE request error:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+};
+
+export const login = async (credentials: Credentials): Promise<ApiResponse> => {
+  return post(`${URL_ENDPOINT}/auth/login`, credentials);
+};
