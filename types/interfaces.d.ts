@@ -15,3 +15,8 @@ export interface IPlantDetails extends ISimplePlant {
 export interface IGardenDetails extends ISimpleGarden {
   gardenOwner: string;
 }
+
+export type OptionItem = {
+  key: string;
+  value: string;
+};

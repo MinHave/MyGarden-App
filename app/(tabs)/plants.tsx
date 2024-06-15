@@ -1,11 +1,5 @@
-// This TypeScript React Native component displays a list of plants.
-// It uses hooks for state management and effects, and navigates to a plant's details on touch.
-
-// Imports from React Native, React, custom components, routing, types, and services
 import {
-  Image,
   StyleSheet,
-  Platform,
   SafeAreaView,
   View,
   PixelRatio,
@@ -14,26 +8,43 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useRouter, useNavigation, useLocalSearchParams } from 'expo-router';
-import { ISimpleGarden, ISimplePlant } from '@/types/interfaces';
-import apiService from '@/services/apiService';
-import { RootStackParamList } from '@/navigation';
+import { useRouter, useNavigation } from 'expo-router';
+import { ISimpleGarden, ISimplePlant, OptionItem } from '@/types/interfaces';
+import apiService, { ApiResponse } from '@/services/apiService';
 import { useIsFocused } from '@react-navigation/native';
+// import { SelectDropdown, DropdownData } from 'expo-select-dropdown';
+import ui from '@/store/ui';
+import { Dropdown } from 'react-native-element-dropdown';
 
 // The main functional component for the Plants Screen
 export default function PlantsList() {
   // State to hold the list of plants
   const [getPlants, setPlants] = useState<ISimplePlant[]>([]);
   const [getGarden, setGarden] = useState<ISimpleGarden>();
+  const [getGardens, setGardens] = useState<ISimpleGarden[]>();
+  const [data, setData] = useState<OptionItem[]>([]);
+  const [country, setCountry] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+
+  const [uiUpdateTrigger, setUiUpdateTrigger] = useState(0);
+
+  useEffect(() => {
+    // Register the callback
+    ui.registerUpdateUICallback((value) => {
+      console.log('UI update callback triggered', value);
+      // Update the state to trigger a re-render
+      setUiUpdateTrigger((prev) => prev + 1); // Increment to ensure change
+    });
+
+    // Cleanup the callback on component unmount
+    return () => ui.registerUpdateUICallback(() => {});
+  }, []);
+
   // Hooks for routing and navigation
   const router = useRouter();
   const navigation = useNavigation();
-  // Placeholder for theme logic
-  const isThemeDark = false;
   // Hook to check if the screen is focused
   const isFocused = useIsFocused();
 
@@ -44,22 +55,46 @@ export default function PlantsList() {
 
   useEffect(() => {
     if (getGarden != undefined) {
-      // fetchGardenData();
+      fetchPlants();
+      makeGardenListToDropDownData();
     }
   }, [setGarden]);
 
   // Function to initialize data fetching
-  const onStartup = () => {
+  const onStartup = async () => {
     fetchPlants();
-    setGarden(undefined);
+    await getAllGardens();
+    if (getGardens && getGardens?.length > 0) {
+      setGarden(getGardens[0]);
+    }
   };
+
+  function makeGardenListToDropDownData() {
+    var optionItems: OptionItem[] = [];
+    if (getGardens && getGardens?.length > 0) {
+      getGardens.forEach((garden) => {
+        optionItems.push({ value: garden.name, key: garden.id });
+      });
+    }
+    setData(optionItems);
+  }
+
+  async function getAllGardens() {
+    var result: ApiResponse<ISimpleGarden[]> | null = null;
+    if (result != null) {
+      setGardens(result);
+    }
+  }
 
   // Mock function to fetch plants data
   async function fetchPlants() {
-    var result = await apiService.getPlants(getGarden?.id);
-    // Placeholder for fetching plants data
-    if (result.data) {
-      setPlants(result.data);
+    var result: ApiResponse<ISimplePlant[]> | null = null;
+    if (getGarden != undefined) {
+      result = await apiService.getPlants(getGarden.id);
+
+      if (result.data) {
+        setPlants(result.data);
+      }
     }
   }
 
@@ -124,6 +159,35 @@ export default function PlantsList() {
       <View style={styles.titleContainer}>
         <ThemedText type="title">Plants</ThemedText>
       </View>
+      <View>
+        <Dropdown
+          style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          data={data}
+          search
+          maxHeight={300}
+          labelField="value"
+          valueField="value"
+          placeholder={!isFocus ? 'Select country' : '...'}
+          searchPlaceholder="Search..."
+          value={country}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
+          onChange={(item) => {
+            // setCountry(item.value);
+            // handleState(item.value);
+            // setCountryName(item.label);
+            setIsFocus(false);
+          }}
+        />
+        {/* <Dropdown
+          data={makeGardenListToDropDownData()}
+          onChange={console.log}
+          placeholder=""
+        /> */}
+      </View>
       <View style={styles.titleContainer}>
         {getPlants.length > 0 ? (
           <FlatList
@@ -139,6 +203,14 @@ export default function PlantsList() {
 
 // StyleSheet for the component
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    gap: 10,
+  },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -148,11 +220,29 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
+  dropdown: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 10,
+  },
   reactLogo: {
     height: 178,
     width: 290,
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
   },
 });
