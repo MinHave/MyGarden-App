@@ -1,12 +1,26 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import auth from '@/store/auth';
+import ui from '@/store/ui';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const [uiUpdateTrigger, setUiUpdateTrigger] = useState(0);
+
+  useEffect(() => {
+    // Register the callback
+    ui.registerUpdateUICallback((value) => {
+      console.log('UI update callback triggered', value);
+      // Update the state to trigger a re-render
+      setUiUpdateTrigger((prev) => prev + 1); // Increment to ensure change
+    });
+
+    // Cleanup the callback on component unmount
+    return () => ui.registerUpdateUICallback(() => {});
+  }, []);
 
   return (
     <Tabs

@@ -3,7 +3,7 @@ export interface ICurrentUser {
   id: stirng;
   token: string;
   name: string;
-  email: string;
+  username: string;
   phoneNumber: string;
   refreshToken: string;
   roles: List<T>;

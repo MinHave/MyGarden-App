@@ -7,14 +7,14 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import { StackActions } from '@react-navigation/native';
+import { StackActions, TabActions } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { login } from '@/services/apiService';
 import auth from '../store/auth';
 import { showMessage } from 'react-native-flash-message';
-import { Credentials } from '@/services/apiService';
 import { ICurrentUser } from '@/store/interfaces/auth';
-
+import { credentials } from '@/types/apiService';
+import ui from '@/store/ui';
 interface LoginComponentProps {
   navigation: any;
 }
@@ -27,7 +27,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
 
   const tryLogin = async () => {
     setLoading(true);
-    const data: Credentials = {
+    const data: credentials = {
       username: getEmail,
       password: getPassword,
     };
@@ -44,10 +44,11 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
           backgroundColor: '#FF0000', // Error color
         });
       } else {
-        if (resultData.email != null) {
+        if (resultData.username != null) {
           await auth.setUser(resultData);
           setLoading(false);
-          navigation.dispatch(StackActions.replace('Scan'));
+          ui.setUpdateUI(true); // Trigger the UI update
+          navigation.dispatch(TabActions.jumpTo('scan'));
         } else {
           setLoading(false);
           showMessage({
