@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { ICurrentUser } from './interfaces/auth';
 import ui from '@/store/ui';
-import { login, refreshAuth, resetPassword } from '@/services/apiService';
+import apiService from '@/services/apiService';
 import { logoutNavigate } from '../components/RootNavigation';
 
 const emptyUserObject: ICurrentUser = {
@@ -27,7 +27,7 @@ const auth = {
   },
   async login(username: string, password: string): Promise<void> {
     try {
-      const response = await login({ username, password });
+      const response = await apiService.login({ username, password });
       if (response.data) {
         // Assuming response contains user data and refresh token
         await this.setUser(response.data);
@@ -53,7 +53,7 @@ const auth = {
     const cachedToken = await this.refreshToken();
     if (cachedToken !== 'logged out' && cachedToken) {
       try {
-        const response = await refreshAuth(cachedToken);
+        const response = await apiService.refreshAuth(cachedToken);
         if (response.data) {
           await this.setUser(response.data);
           return true;
@@ -75,7 +75,7 @@ const auth = {
 
   async RESET_PASSWORD(username: string): Promise<void> {
     try {
-      await resetPassword(username);
+      await apiService.resetPassword(username);
     } catch (err) {
       console.error('Error resetting password:', err);
     }

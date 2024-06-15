@@ -112,63 +112,49 @@ const del = async <T = any>(url: string): Promise<ApiResponse<T>> => {
   }
 };
 
-//#region Auth
-export const login = async (
-  credentials: credentials
-): Promise<ApiResponse<ICurrentUser>> => {
-  return post(`${URL_ENDPOINT}/auth/login`, credentials);
+const service = {
+  api: 'http://localhost:5000',
+
+  //#region Auth
+  async login(credentials: credentials): Promise<ApiResponse<ICurrentUser>> {
+    return post(`${URL_ENDPOINT}/auth/login`, credentials);
+  },
+  async refreshAuth(refreshCode: string): Promise<ApiResponse<ICurrentUser>> {
+    return postJsonString('auth/refresh', refreshCode, { noAuth: true });
+  },
+  async resetPassword(username: string): Promise<ApiResponse<any>> {
+    return postJsonString('auth/resetPassword', username, { noAuth: true });
+  },
+  //#endregion Auth
+
+  //#region Getters
+  async getPlants(
+    gardenId: string | undefined
+  ): Promise<ApiResponse<ISimplePlant[]>> {
+    return get(`plant/gardenPlants/${gardenId}`);
+  },
+  async getPlant(plantId: string): Promise<ApiResponse<ISimplePlant>> {
+    return get(`plant/${plantId}`);
+  },
+  async getGardenList(): Promise<ApiResponse<ISimpleGarden[]>> {
+    return get(`garden`);
+  },
+  async getGarden(gardenId: string): Promise<ApiResponse<ISimpleGarden>> {
+    return get(`garden/${gardenId}`);
+  },
+  //#endregion Getters
+
+  //#region Setters
+  async updatePlant(plant: IPlantDetails): Promise<ApiResponse<IPlantDetails>> {
+    return put(`plant`, plant);
+  },
+  async updateGarden(
+    garden: IGardenDetails
+  ): Promise<ApiResponse<IPlantDetails>> {
+    return put(`garden`, garden);
+  },
+
+  //#endregion Setters
 };
 
-export const refreshAuth = async (
-  refreshCode: string
-): Promise<ApiResponse<ICurrentUser>> => {
-  return postJsonString('auth/refresh', refreshCode, { noAuth: true });
-};
-
-export const resetPassword = async (username: string) => {
-  return postJsonString('auth/resetPassword', username, {
-    noAuth: true,
-  });
-};
-//#endregion Auth
-
-//#region Getters
-export const getPlants = async (
-  gardenId: string | undefined
-): Promise<ApiResponse<ISimplePlant[]>> => {
-  return get(`plant/gardenPlants/${gardenId}`);
-};
-
-export const getPlant = async (
-  plantId: string
-): Promise<ApiResponse<ISimplePlant>> => {
-  return get(`plant/${plantId}`);
-};
-
-export const getGardenList = async (): Promise<
-  ApiResponse<ISimpleGarden[]>
-> => {
-  return get(`garden`);
-};
-
-export const getGarden = async (
-  gardenId: string
-): Promise<ApiResponse<ISimpleGarden>> => {
-  return get(`garden/${gardenId}`);
-};
-//#endregion Getters
-
-//#region Setters
-
-export const updatePlant = async (
-  plant: IPlantDetails
-): Promise<ApiResponse<IPlantDetails>> => {
-  return put(`plant`, plant);
-};
-export const updateGarden = async (
-  garden: IGardenDetails
-): Promise<ApiResponse<IPlantDetails>> => {
-  return put(`garden`, garden);
-};
-
-//#endregion Setters
+export default service;

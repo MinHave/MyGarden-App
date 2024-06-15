@@ -58,8 +58,9 @@ export default function PlantsList() {
   async function fetchPlants() {
     var result = await apiService.getPlants(getGarden?.id);
     // Placeholder for fetching plants data
-    var result: ISimplePlant[] = [{ id: '8y97f-asd12-12asd5', name: 'Test 1' }];
-    setPlants(result);
+    if (result.data) {
+      setPlants(result.data);
+    }
   }
 
   // Function to handle navigation to plant details

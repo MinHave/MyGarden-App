@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { StackActions, TabActions } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { login } from '@/services/apiService';
+import apiService from '@/services/apiService';
 import auth from '../store/auth';
 import { showMessage } from 'react-native-flash-message';
 import { ICurrentUser } from '@/store/interfaces/auth';
@@ -32,7 +32,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
       password: getPassword,
     };
     try {
-      const result = await login(data);
+      const result = await apiService.login(data);
       console.log('Login result:', result);
       const resultData = result.data as ICurrentUser;
       if (!result.success) {
