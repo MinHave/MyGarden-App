@@ -8,10 +8,14 @@ export interface ISimpleGarden {
   gardenName: string;
 }
 
-export interface IPlantDetails extends ISimplePlant {
+export interface ICreatePlant {
+  name: string;
   description: string;
   specie: string;
+  gardenId: string;
 }
+
+export interface IPlantDetails extends ISimplePlant, ICreatePlant {}
 
 export interface IGardenDetails extends ISimpleGarden {
   gardenOwner: string;

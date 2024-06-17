@@ -43,6 +43,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="addNewPlant"
+        options={{
+          href: null,
+          title: 'AddNewPlant',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? 'leaf' : 'leaf-outline'}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="plantDetails"
         options={{
           href: null,

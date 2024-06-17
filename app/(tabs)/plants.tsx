@@ -69,6 +69,7 @@ export default function PlantsList() {
   // Function to initialize data fetching
   const onStartup = async () => {
     await getAllGardens();
+    if (getGarden) fetchPlants();
   };
 
   function mapToDropDownData(garden: ISimpleGarden) {
@@ -110,6 +111,12 @@ export default function PlantsList() {
         setPlants(result.data);
       }
     }
+  }
+
+  function addNewPlant() {
+    navigation.dispatch(
+      TabActions.jumpTo('addNewPlant', { gardenId: getGarden?.id })
+    );
   }
 
   // Function to handle navigation to plant details
@@ -157,7 +164,7 @@ export default function PlantsList() {
                 }}
               >
                 <Text style={{ color: '#fff', textAlign: 'center' }}>
-                  click me
+                  Details
                 </Text>
               </TouchableOpacity>
             </View>
@@ -169,7 +176,7 @@ export default function PlantsList() {
 
   // Main component return with SafeAreaView and FlatList of plants
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.titleContainer}>
         <ThemedText type="title">Plants</ThemedText>
       </View>
@@ -186,9 +193,38 @@ export default function PlantsList() {
           />
         ) : null}
       </View>
-      <View style={styles.titleContainer}>
+      {/* Button to add new plant */}
+      {getGarden != null ? (
+        <View
+          style={[
+            {
+              paddingTop: 10,
+              alignSelf: 'flex-end',
+            },
+          ]}
+        >
+          <TouchableOpacity
+            onPress={() => addNewPlant()}
+            style={{
+              backgroundColor: '#009e73',
+              elevation: 0,
+              width: 85,
+              alignSelf: 'center',
+              paddingVertical: 8,
+              borderRadius: 4,
+            }}
+          >
+            <Text style={{ color: '#fff', textAlign: 'center' }}>
+              Add plant
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+      <View style={[styles.container]}>
         {getPlants.length > 0 ? (
           <FlatList
+            style={{ minWidth: '100%' }}
+            scrollEnabled={true}
             data={getPlants}
             renderItem={renderItem}
             keyExtractor={(item) => item.id.toString()}

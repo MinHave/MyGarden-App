@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { credentials, inOptions } from '@/types/apiService';
 import {
+  ICreatePlant,
   IGardenDetails,
   IPlantDetails,
   ISimpleGarden,
@@ -165,12 +166,15 @@ const service = {
   async getGardenList(): Promise<ApiResponse<ISimpleGarden[]>> {
     return get(`garden`);
   },
-  async getGarden(gardenId: string): Promise<ApiResponse<ISimpleGarden>> {
+  async getGarden(gardenId: string): Promise<ApiResponse<IGardenDetails>> {
     return get(`garden/${gardenId}`);
   },
   //#endregion Getters
 
   //#region Setters
+  async createPlant(plant: ICreatePlant): Promise<ApiResponse<IPlantDetails>> {
+    return post(`plant`, plant, null);
+  },
   async updatePlant(plant: IPlantDetails): Promise<ApiResponse<IPlantDetails>> {
     return put(`plant`, plant, null);
   },
