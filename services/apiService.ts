@@ -7,9 +7,12 @@ import {
   ISimpleGarden,
   ISimplePlant,
 } from '@/types/interfaces';
+import auth from '@/store/auth';
+import { DateTime } from 'luxon';
 
 // Replace with your machine's IP address and port number
 const URL_ENDPOINT = 'https://api.tavsogmatias.com';
+const timeoutTime = 20000;
 
 const api = axios.create({
   baseURL: URL_ENDPOINT,
@@ -24,10 +27,40 @@ export interface ApiResponse<T = any> {
   data?: T;
 }
 
+const getOptions = async (inOptions?: inOptions): Promise<any> => {
+  if (
+    !inOptions?.noAuth &&
+    auth.currentUser.expires <
+      DateTime.local().setZone('Europe/Copenhagen').toISO()
+  ) {
+    console.log('token expired, refreshing');
+    const getRefreshToken = await auth.refreshToken();
+    const response = await service.refreshAuth(getRefreshToken);
+    await auth.setUser(response.data!);
+  }
+
+  const token = auth.authToken();
+  if (!inOptions?.noAuth && token) {
+    return {
+      ...inOptions,
+      timeout: timeoutTime,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...inOptions?.headers,
+      },
+    };
+  } else {
+    return {
+      ...inOptions,
+      timeout: timeoutTime,
+    };
+  }
+};
+
 const get = async <T = any>(url: string): Promise<ApiResponse<T>> => {
   try {
     console.log(`GET request to: ${url}`);
-    const response: AxiosResponse<T> = await api.get(url);
+    const response: AxiosResponse<T> = await api.get(url, await getOptions());
     return {
       success: true,
       data: response.data,
@@ -44,11 +77,15 @@ const get = async <T = any>(url: string): Promise<ApiResponse<T>> => {
 const post = async <T = any>(
   url: string,
   data: object | string,
-  options?: inOptions
+  options?: inOptions | null
 ): Promise<ApiResponse<T>> => {
   try {
     console.log(`POST request to: ${url} with data:`, data);
-    const response: AxiosResponse<T> = await api.post(url, data);
+    const response: AxiosResponse<T> = await api.post(
+      url,
+      data,
+      await getOptions(options!)
+    );
     return {
       success: true,
       data: response.data,
@@ -65,7 +102,7 @@ const post = async <T = any>(
 const postJsonString = async <T = any>(
   url: string,
   payload: object | string,
-  options: inOptions
+  options: inOptions | null
 ): Promise<ApiResponse<T>> => {
   return post(url, JSON.stringify(payload), {
     headers: {
@@ -77,34 +114,22 @@ const postJsonString = async <T = any>(
 
 const put = async <T = any>(
   url: string,
-  data: any
+  data: any,
+  options: inOptions | null
 ): Promise<ApiResponse<T>> => {
   try {
     console.log(`PUT request to: ${url} with data:`, data);
-    const response: AxiosResponse<T> = await api.put(url, data);
+    const response: AxiosResponse<T> = await api.put(
+      url,
+      data,
+      await getOptions(options!)
+    );
     return {
       success: true,
       data: response.data,
     };
   } catch (error: any) {
     console.error('PUT request error:', error);
-    return {
-      success: false,
-      message: error.response?.data?.message || error.message,
-    };
-  }
-};
-
-const del = async <T = any>(url: string): Promise<ApiResponse<T>> => {
-  try {
-    console.log(`DELETE request to: ${url}`);
-    const response: AxiosResponse<T> = await api.delete(url);
-    return {
-      success: true,
-      data: response.data,
-    };
-  } catch (error: any) {
-    console.error('DELETE request error:', error);
     return {
       success: false,
       message: error.response?.data?.message || error.message,
@@ -146,12 +171,12 @@ const service = {
 
   //#region Setters
   async updatePlant(plant: IPlantDetails): Promise<ApiResponse<IPlantDetails>> {
-    return put(`plant`, plant);
+    return put(`plant`, plant, null);
   },
   async updateGarden(
     garden: IGardenDetails
   ): Promise<ApiResponse<IPlantDetails>> {
-    return put(`garden`, garden);
+    return put(`garden`, garden, null);
   },
 
   //#endregion Setters

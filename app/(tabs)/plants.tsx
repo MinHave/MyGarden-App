@@ -23,7 +23,7 @@ export default function PlantsList() {
   // State to hold the list of plants
   const [getPlants, setPlants] = useState<ISimplePlant[]>([]);
   const [getGarden, setGarden] = useState<ISimpleGarden>();
-  const [getGardens, setGardens] = useState<ISimpleGarden[]>();
+  const [getGardens, setGardens] = useState<ISimpleGarden[] | null>();
   const [data, setData] = useState<OptionItem[]>([]);
   const [country, setCountry] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
@@ -56,17 +56,18 @@ export default function PlantsList() {
   useEffect(() => {
     if (getGarden != undefined) {
       fetchPlants();
+    }
+  }, [getGarden]);
+  useEffect(() => {
+    if (getGardens && getGardens.length > 0) {
+      setGarden(getGardens[0]);
       makeGardenListToDropDownData();
     }
-  }, [setGarden]);
+  }, [getGardens]);
 
   // Function to initialize data fetching
   const onStartup = async () => {
-    fetchPlants();
     await getAllGardens();
-    if (getGardens && getGardens?.length > 0) {
-      setGarden(getGardens[0]);
-    }
   };
 
   function makeGardenListToDropDownData() {
@@ -81,8 +82,9 @@ export default function PlantsList() {
 
   async function getAllGardens() {
     var result: ApiResponse<ISimpleGarden[]> | null = null;
+    result = await apiService.getGardenList();
     if (result != null) {
-      setGardens(result);
+      setGardens(result.data);
     }
   }
 
@@ -176,9 +178,6 @@ export default function PlantsList() {
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={(item) => {
-            // setCountry(item.value);
-            // handleState(item.value);
-            // setCountryName(item.label);
             setIsFocus(false);
           }}
         />

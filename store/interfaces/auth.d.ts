@@ -1,6 +1,6 @@
 export interface ICurrentUser {
   expires: string;
-  id: stirng;
+  id: string;
   token: string;
   name: string;
   username: string;
