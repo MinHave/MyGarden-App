@@ -101,6 +101,34 @@ const post = async <T = any>(
   }
 };
 
+const del = async <T = any>(
+  url: string,
+  data: object | string
+): Promise<ApiResponse<T>> => {
+  try {
+    console.log(`DELETE request to: ${url} with data:`, data);
+    const response: AxiosResponse<T> = await api.delete(url, { data });
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (err) {
+    console.error('DELETE request error:', err);
+    // Assuming err is of type AxiosError for better type safety
+    if (axios.isAxiosError(err)) {
+      return {
+        success: false,
+        message: err.response?.data?.message || err.message,
+      };
+    }
+    // Fallback error message if error is not an AxiosError
+    return {
+      success: false,
+      message: 'An unexpected error occurred',
+    };
+  }
+};
+
 const postJsonString = async <T = any>(
   url: string,
   payload: object | string,
@@ -144,7 +172,7 @@ const service = {
 
   //#region Auth
   async login(credentials: credentials): Promise<ApiResponse<ICurrentUser>> {
-    return post(`${URL_ENDPOINT}/auth/login`, credentials);
+    return post(`auth/login`, credentials);
   },
   async refreshAuth(refreshCode: string): Promise<ApiResponse<ICurrentUser>> {
     return postJsonString('auth/refresh', refreshCode, { noAuth: true });
@@ -183,8 +211,13 @@ const service = {
   ): Promise<ApiResponse<IPlantDetails>> {
     return put(`garden`, garden, null);
   },
-
   //#endregion Setters
+
+  //#region Delete
+  async deletePlant(plant: IPlantDetails): Promise<ApiResponse<Boolean>> {
+    return del(`plant`, plant);
+  },
+  //#endregion
 };
 
 export default service;
