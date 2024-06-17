@@ -2,11 +2,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { ICurrentUser } from './interfaces/auth';
 import ui from '@/store/ui';
 import apiService from '@/services/apiService';
-import { logoutNavigate } from '../components/RootNavigation';
 
 const emptyUserObject: ICurrentUser = {
   expires: '',
-  id: undefined,
+  id: '',
   token: '',
   name: '',
   username: '',
@@ -70,7 +69,7 @@ const auth = {
   },
 
   isAuthorized() {
-    return this.currentUser.token == '' ? false : true;
+    return this.currentUser?.token == '' ? false : true;
   },
 
   async RESET_PASSWORD(username: string): Promise<void> {
@@ -81,13 +80,15 @@ const auth = {
     }
   },
 
-  async LOGOUT(): Promise<void> {
+  async LOGOUT(): Promise<Boolean> {
     try {
       await AsyncStorage.clear();
       this.currentUser = emptyUserObject;
-      logoutNavigate();
+      // logoutNavigate();
+      return true;
     } catch (e) {
       console.error('Logout failed:', e);
+      return false;
     }
   },
 

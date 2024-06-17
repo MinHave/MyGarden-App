@@ -9,7 +9,7 @@ import {
   Text,
 } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
-import apiService from '../services/apiService_2';
+import apiService from '../services/apiService';
 import { showMessage } from 'react-native-flash-message';
 
 interface ChangePasswordComponentProps {

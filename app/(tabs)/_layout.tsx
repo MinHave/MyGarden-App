@@ -13,7 +13,6 @@ export default function TabLayout() {
   useEffect(() => {
     // Register the callback
     ui.registerUpdateUICallback((value) => {
-      console.log('UI update callback triggered', value);
       // Update the state to trigger a re-render
       setUiUpdateTrigger((prev) => prev + 1); // Increment to ensure change
     });

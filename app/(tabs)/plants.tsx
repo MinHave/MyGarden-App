@@ -32,7 +32,6 @@ export default function PlantsList() {
   useEffect(() => {
     // Register the callback
     ui.registerUpdateUICallback((value) => {
-      console.log('UI update callback triggered', value);
       // Update the state to trigger a re-render
       setUiUpdateTrigger((prev) => prev + 1); // Increment to ensure change
     });
@@ -56,7 +55,6 @@ export default function PlantsList() {
 
   useEffect(() => {
     if (getGarden != undefined) {
-      console.log('getGarden is called');
       fetchPlants();
       ui.setUpdateUI(true);
     }
@@ -65,13 +63,8 @@ export default function PlantsList() {
   useEffect(() => {
     if (getGardens && getGardens.length > 0) {
       makeGardenListToDropDownData();
-      // fetchPlants();
     }
   }, [getGardens]);
-
-  // useEffect(() => {
-  //   console.log('getPlants', getPlants);
-  // }, [getPlants]);
 
   // Function to initialize data fetching
   const onStartup = async () => {
@@ -114,8 +107,6 @@ export default function PlantsList() {
       result = await apiService.getPlants(getGarden.id);
 
       if (result.data) {
-        console.log('1', getGarden.id);
-
         setPlants(result.data);
       }
     }
@@ -126,9 +117,6 @@ export default function PlantsList() {
     navigation.dispatch(
       TabActions.jumpTo('plantDetails', { plantId: plant.id })
     );
-    // navigation.navigate('PlantDetails', {
-    //   plantId: plant.id,
-    // });
   }
 
   // Function to render each plant item

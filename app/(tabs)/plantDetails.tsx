@@ -20,7 +20,6 @@ export default function PlantsList() {
   useEffect(() => {
     // Register the callback
     ui.registerUpdateUICallback((value) => {
-      console.log('UI update callback triggered', value);
       // Update the state to trigger a re-render
       setUiUpdateTrigger((prev) => prev + 1); // Increment to ensure change
     });
@@ -30,7 +29,7 @@ export default function PlantsList() {
   }, []);
 
   useEffect(() => {
-    console.log('getPlant: ', getPlant);
+    // console.log('getPlant: ', getPlant);
   }, [getPlant]);
 
   // Hook to check if the screen is focused
