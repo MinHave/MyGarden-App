@@ -13,7 +13,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { useRouter, useNavigation } from 'expo-router';
 import { ISimpleGarden, ISimplePlant, OptionItem } from '@/types/interfaces';
 import apiService, { ApiResponse } from '@/services/apiService';
-import { useIsFocused } from '@react-navigation/native';
+import { TabActions, useIsFocused } from '@react-navigation/native';
 // import { SelectDropdown, DropdownData } from 'expo-select-dropdown';
 import ui from '@/store/ui';
 // import { Dropdown } from 'react-native-element-dropdown';
@@ -123,9 +123,12 @@ export default function PlantsList() {
 
   // Function to handle navigation to plant details
   function plantDetails(plant: ISimplePlant) {
-    navigation.navigate('PlantDetails', {
-      plantId: plant.id,
-    });
+    navigation.dispatch(
+      TabActions.jumpTo('plantDetails', { plantId: plant.id })
+    );
+    // navigation.navigate('PlantDetails', {
+    //   plantId: plant.id,
+    // });
   }
 
   // Function to render each plant item

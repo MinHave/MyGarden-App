@@ -158,7 +158,7 @@ const service = {
   ): Promise<ApiResponse<ISimplePlant[]>> {
     return get(`plant/gardenPlants/${gardenId}`);
   },
-  async getPlant(plantId: string): Promise<ApiResponse<ISimplePlant>> {
+  async getPlant(plantId: string): Promise<ApiResponse<IPlantDetails>> {
     return get(`plant/${plantId}`);
   },
   async getGardenList(): Promise<ApiResponse<ISimpleGarden[]>> {

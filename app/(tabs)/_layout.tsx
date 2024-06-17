@@ -44,6 +44,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="plantDetails"
+        options={{
+          href: null,
+          title: 'PlantDetails',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? 'leaf' : 'leaf-outline'}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="plants"
         options={{
           href: auth.isAuthorized() ? 'plants' : null,
