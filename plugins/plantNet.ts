@@ -1,42 +1,63 @@
-// import axios from 'axios';
+import * as FileSystem from 'expo-file-system';
+import axios from 'axios';
+import * as base64 from 'base64-js';
 
-// const url = 'https://my-api.plantnet.org/v2/identify/all';
-// const params = {
-//   'include-related-images': 'false',
-//   'no-reject': 'false',
-//   lang: 'en',
-// };
-// const headers = {
-//   accept: 'application/json',
-//   'Content-Type': 'multipart/form-data',
-// };
+const url = 'https://my-api.plantnet.org/v2/identify/all';
+const apiKey = '2b10ufHDk4ltygFNOasZO1LjNe'; // Use environment variable for API key
+const params = {
+  'include-related-images': 'false',
+  'no-reject': 'false',
+  lang: 'en',
+  'api-key': apiKey,
+};
 
-// async function identifyPlant(base64Image: string) {
-//   // Convert the base64 string to a Buffer
-//   const buffer = Buffer.from(base64Image, 'base64');
+export async function identifyPlant(base64Image: string) {
+  if (!base64Image) {
+    console.error('Base64 image string is empty.');
+    return;
+  }
 
-//   // Create FormData
-//   const form = new FormData();
-//   form.append('images', buffer, {
-//     filename: 'image.png',
-//     contentType: 'image/png',
-//   });
+  try {
+    // Convert base64 to a file and get the URI
+    const binaryArray = base64.toByteArray(base64Image);
+    const base64String = base64.fromByteArray(binaryArray);
+    const fileUri = FileSystem.documentDirectory + 'image.png';
 
-//   try {
-//     const response = await axios.post(url, form, {
-//       headers: {
-//         ...headers,
-//         ...form.getHeaders(),
-//       },
-//       params: params,
-//     });
-//     console.log(response.data);
-//   } catch (error) {
-//     console.error('Error identifying plant:', error);
-//   }
-// }
+    await FileSystem.writeAsStringAsync(fileUri, base64String, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
 
-// // Example base64 string (truncated for example purposes)
-// const base64String = 'iVBORw0KGgoAAAANSUhEUgAA...'; // Replace with your actual base64 string
+    // Create form data
+    const formData = new FormData();
+    formData.append('images', {
+      uri: fileUri,
+      name: 'image.png',
+      type: 'image/png',
+    } as any);
 
-// identifyPlant(base64String);
+    console.log('fileUri', fileUri);
+    console.log('formData', formData);
+
+    const fileInfo = await FileSystem.getInfoAsync(fileUri);
+    console.log('File Info:', fileInfo);
+
+    // Send the POST request
+    const response = await axios.post(url, formData, {
+      headers: {
+        Accept: 'application/json',
+      },
+      params: params,
+    });
+
+    if (response.status !== 200) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log(response.data);
+  } catch (error: any) {
+    console.error(
+      'Error identifying plant:',
+      error.response?.data || error.message
+    );
+  }
+}
