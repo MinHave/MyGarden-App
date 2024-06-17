@@ -10,11 +10,21 @@ export default function ScanView() {
 
   async function takeImage() {
     if (cameraRef.current) {
-      let base64String = (
-        await cameraRef.current.takePictureAsync({ base64: true })
-      )?.base64;
-      // console.log('IMAGE: ', base64String);
-      if (base64String) identifyPlant(base64String);
+      let plantData = await cameraRef.current.takePictureAsync({
+        base64: true,
+      });
+      // let plantData = await cameraRef.current.takePictureAsync();
+      // console.log('IMAGE: ', plantData?.uri);
+      if (plantData && plantData.base64) {
+        console.log('');
+        console.log('y');
+        console.log('');
+        let file = base64ToBlob(plantData.base64);
+        console.log('file', file);
+
+        await identifyPlant(file);
+        // }
+      }
     }
   }
 
@@ -35,9 +45,26 @@ export default function ScanView() {
     );
   }
 
-  function toggleCameraFacing() {
-    setFacing((current) => (current === 'back' ? 'front' : 'back'));
-  }
+  const base64ToBlob = (base64Data: string): Blob => {
+    // Split the base64 string to get the content type and the actual data
+    const splitData = base64Data.split(',');
+    const contentType = splitData[0].split(':')[1].split(';')[0];
+    const b64Data = splitData[1];
+
+    // Convert base64 to binary string
+    const byteCharacters = atob(b64Data);
+
+    // Create an array buffer and a view (as a byte array)
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+
+    // Create a blob from the byte array
+    const blob = new Blob([byteArray], { type: contentType });
+    return blob;
+  };
 
   return (
     <View style={styles.container}>
