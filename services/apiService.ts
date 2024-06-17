@@ -1,4 +1,3 @@
-import { ICurrentUser } from '@/store/interfaces/auth';
 import axios, { AxiosResponse } from 'axios';
 import { credentials, inOptions } from '@/types/apiService';
 import {
@@ -7,8 +6,9 @@ import {
   ISimpleGarden,
   ISimplePlant,
 } from '@/types/interfaces';
-import auth from '@/store/auth';
+import auth from '@/store/auth'; // Remove this import
 import { DateTime } from 'luxon';
+import { ICurrentUser } from '@/store/interfaces/auth';
 
 // Replace with your machine's IP address and port number
 const URL_ENDPOINT = 'https://api.tavsogmatias.com';
@@ -30,6 +30,7 @@ export interface ApiResponse<T = any> {
 const getOptions = async (inOptions?: inOptions): Promise<any> => {
   if (
     !inOptions?.noAuth &&
+    auth.isAuthorized() &&
     auth.currentUser.expires <
       DateTime.local().setZone('Europe/Copenhagen').toISO()
   ) {

@@ -32,31 +32,38 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
       password: getPassword,
     };
     try {
-      const result = await apiService.login(data);
-      console.log('Login result:', result);
-      const resultData = result.data as ICurrentUser;
-      if (!result.success) {
-        setLoading(false);
-        showMessage({
-          message: 'Login failed',
-          description: result.message,
-          type: 'default',
-          backgroundColor: '#FF0000', // Error color
-        });
-      } else {
-        if (resultData.username != null) {
-          await auth.setUser(resultData);
-          setLoading(false);
-          ui.setUpdateUI(true); // Trigger the UI update
-          navigation.dispatch(TabActions.jumpTo('scan'));
-        } else {
+      const result = await auth.login({
+        username: data.username,
+        password: data.password,
+        apiService,
+      });
+      if (result != null) {
+        // const result = await apiService.login(data);
+        console.log('Login result:', result);
+        const resultData = result.data as ICurrentUser;
+        if (!result.success) {
           setLoading(false);
           showMessage({
-            message: 'Invalid login',
-            description: 'This app is only for instructors',
+            message: 'Login failed',
+            description: result.message,
             type: 'default',
             backgroundColor: '#FF0000', // Error color
           });
+        } else {
+          if (resultData.username != null) {
+            await auth.setUser(resultData);
+            setLoading(false);
+            ui.setUpdateUI(true); // Trigger the UI update
+            navigation.dispatch(TabActions.jumpTo('scan'));
+          } else {
+            setLoading(false);
+            showMessage({
+              message: 'Invalid login',
+              description: 'This app is only for instructors',
+              type: 'default',
+              backgroundColor: '#FF0000', // Error color
+            });
+          }
         }
       }
     } catch (error) {

@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { ICurrentUser } from './interfaces/auth';
 import ui from '@/store/ui';
-import apiService from '@/services/apiService';
+import apiService, { ApiResponse } from '@/services/apiService'; // Remove this import
 
 const emptyUserObject: ICurrentUser = {
   expires: '',
@@ -24,17 +24,28 @@ const auth = {
   async refreshToken(): Promise<string> {
     return (await AsyncStorage.getItem('@refreshToken')) ?? '';
   },
-  async login(username: string, password: string): Promise<void> {
+  async login({
+    username,
+    password,
+    apiService,
+  }: {
+    username: string;
+    password: string;
+    apiService: any;
+  }): Promise<ApiResponse<ICurrentUser> | null> {
+    // Add apiService as parameter
     try {
       const response = await apiService.login({ username, password });
       if (response.data) {
         // Assuming response contains user data and refresh token
         await this.setUser(response.data);
+        return response;
       }
     } catch (err) {
       console.error('Login failed:', err);
       // Handle login failure (e.g., update UI state, show error message)
     }
+    return null;
   },
 
   // Setters
@@ -48,7 +59,8 @@ const auth = {
   },
 
   // Handlers
-  async AUTHENTICATE_REFRESH(): Promise<boolean> {
+  async AUTHENTICATE_REFRESH(apiService: any): Promise<boolean> {
+    // Add apiService as parameter
     const cachedToken = await this.refreshToken();
     if (cachedToken !== 'logged out' && cachedToken) {
       try {
@@ -72,7 +84,8 @@ const auth = {
     return this.currentUser?.token == '' ? false : true;
   },
 
-  async RESET_PASSWORD(username: string): Promise<void> {
+  async RESET_PASSWORD(username: string, apiService: any): Promise<void> {
+    // Add apiService as parameter
     try {
       await apiService.resetPassword(username);
     } catch (err) {

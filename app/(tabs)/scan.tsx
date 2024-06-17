@@ -69,14 +69,10 @@ export default function ScanView() {
   return (
     <View style={styles.container}>
       <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
-        {/* Added ref here */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={takeImage}>
             <Text style={styles.text}>Take image</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Flip Camera</Text>
-          </TouchableOpacity> */}
         </View>
       </CameraView>
     </View>
