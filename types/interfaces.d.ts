@@ -5,6 +5,7 @@ export interface ISimplePlant {
 export interface ISimpleGarden {
   id: string;
   name: string;
+  gardenName: string;
 }
 
 export interface IPlantDetails extends ISimplePlant {
@@ -17,6 +18,6 @@ export interface IGardenDetails extends ISimpleGarden {
 }
 
 export type OptionItem = {
-  key: string;
-  value: string;
+  key: any;
+  value: any;
 };

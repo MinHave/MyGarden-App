@@ -16,17 +16,16 @@ import apiService, { ApiResponse } from '@/services/apiService';
 import { useIsFocused } from '@react-navigation/native';
 // import { SelectDropdown, DropdownData } from 'expo-select-dropdown';
 import ui from '@/store/ui';
-import { Dropdown } from 'react-native-element-dropdown';
+// import { Dropdown } from 'react-native-element-dropdown';
+import { SelectList } from 'react-native-dropdown-select-list';
 
 // The main functional component for the Plants Screen
 export default function PlantsList() {
   // State to hold the list of plants
   const [getPlants, setPlants] = useState<ISimplePlant[]>([]);
   const [getGarden, setGarden] = useState<ISimpleGarden>();
-  const [getGardens, setGardens] = useState<ISimpleGarden[] | null>();
-  const [data, setData] = useState<OptionItem[]>([]);
-  const [country, setCountry] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
+  const [getGardens, setGardens] = useState<ISimpleGarden[]>();
+  const [selected, setSelected] = React.useState('');
 
   const [uiUpdateTrigger, setUiUpdateTrigger] = useState(0);
 
@@ -50,42 +49,62 @@ export default function PlantsList() {
 
   // Effect to fetch plants when the screen is focused
   useEffect(() => {
-    onStartup();
+    if (isFocused) {
+      onStartup();
+    }
   }, [isFocused]);
 
   useEffect(() => {
     if (getGarden != undefined) {
+      console.log('getGarden is called');
       fetchPlants();
+      ui.setUpdateUI(true);
     }
   }, [getGarden]);
+
   useEffect(() => {
     if (getGardens && getGardens.length > 0) {
-      setGarden(getGardens[0]);
       makeGardenListToDropDownData();
+      // fetchPlants();
     }
   }, [getGardens]);
+
+  // useEffect(() => {
+  //   console.log('getPlants', getPlants);
+  // }, [getPlants]);
 
   // Function to initialize data fetching
   const onStartup = async () => {
     await getAllGardens();
   };
 
+  function mapToDropDownData(garden: ISimpleGarden) {
+    return { key: garden.id, value: garden.gardenName };
+  }
+
   function makeGardenListToDropDownData() {
     var optionItems: OptionItem[] = [];
     if (getGardens && getGardens?.length > 0) {
       getGardens.forEach((garden) => {
-        optionItems.push({ value: garden.name, key: garden.id });
+        optionItems.push(mapToDropDownData(garden));
       });
     }
-    setData(optionItems);
+    return optionItems;
   }
 
   async function getAllGardens() {
     var result: ApiResponse<ISimpleGarden[]> | null = null;
     result = await apiService.getGardenList();
+
     if (result != null) {
       setGardens(result.data);
     }
+  }
+
+  function dropdownToGarden(val: string) {
+    var garden = getGardens?.find((x) => x.id == val);
+    setGarden(garden);
+    getAllGardens();
   }
 
   // Mock function to fetch plants data
@@ -95,6 +114,8 @@ export default function PlantsList() {
       result = await apiService.getPlants(getGarden.id);
 
       if (result.data) {
+        console.log('1', getGarden.id);
+
         setPlants(result.data);
       }
     }
@@ -162,30 +183,17 @@ export default function PlantsList() {
         <ThemedText type="title">Plants</ThemedText>
       </View>
       <View>
-        <Dropdown
-          style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          data={data}
-          search
-          maxHeight={300}
-          labelField="value"
-          valueField="value"
-          placeholder={!isFocus ? 'Select country' : '...'}
-          searchPlaceholder="Search..."
-          value={country}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={(item) => {
-            setIsFocus(false);
-          }}
-        />
-        {/* <Dropdown
-          data={makeGardenListToDropDownData()}
-          onChange={console.log}
-          placeholder=""
-        /> */}
+        {getGardens && getGardens?.length > 0 ? (
+          <SelectList
+            placeholder="Select garden"
+            setSelected={(val: any) => setSelected(val)}
+            onSelect={() => dropdownToGarden(selected)}
+            save="key"
+            data={makeGardenListToDropDownData()}
+            dropdownTextStyles={{ color: '#fff' }}
+            inputStyles={{ color: '#fff' }}
+          />
+        ) : null}
       </View>
       <View style={styles.titleContainer}>
         {getPlants.length > 0 ? (
