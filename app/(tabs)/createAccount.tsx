@@ -20,8 +20,8 @@ import { validEmail } from '@/plugins/utils';
 export default function AddNewAccount() {
   const [getName, setName] = useState('');
   const [getUsername, setUsername] = useState('');
-  const [getPassword1, setPassword1] = useState('');
-  const [getPassword2, setPassword2] = useState('');
+  // const [getPassword1, setPassword1] = useState('');
+  // const [getPassword2, setPassword2] = useState('');
   const [getPhoneNumber, setPhoneNumber] = useState('');
 
   const [hidePassword, setHidePassword] = useState(true);
@@ -57,8 +57,8 @@ export default function AddNewAccount() {
   const onStartup = async () => {
     setName('');
     setUsername('');
-    setPassword1('');
-    setPassword2('');
+    // setPassword1('');
+    // setPassword2('');
     setPhoneNumber('');
   };
 
@@ -76,14 +76,14 @@ export default function AddNewAccount() {
       Alert.alert('Phone number must be set', '', [{ text: 'OK' }]);
       return false;
     }
-    if (getPassword1 === '') {
-      Alert.alert('Password must be set', '', [{ text: 'OK' }]);
-      return false;
-    }
-    if (getPassword2 !== getPassword1) {
-      Alert.alert('Passwords must match', '', [{ text: 'OK' }]);
-      return false;
-    }
+    // if (getPassword1 === '') {
+    //   Alert.alert('Password must be set', '', [{ text: 'OK' }]);
+    //   return false;
+    // }
+    // if (getPassword2 !== getPassword1) {
+    //   Alert.alert('Passwords must match', '', [{ text: 'OK' }]);
+    //   return false;
+    // }
     return true;
   };
 
@@ -93,7 +93,8 @@ export default function AddNewAccount() {
         id: '',
         name: getName,
         username: getUsername,
-        password: getPassword1,
+        password: '',
+        // password: getPassword1,
         phoneNumber: getPhoneNumber,
         email: getUsername,
       };
@@ -138,7 +139,7 @@ export default function AddNewAccount() {
                 keyboardType="phone-pad"
                 onChangeText={(text) => setPhoneNumber(text)}
               />
-              <View style={styles.passwordRow}>
+              {/* <View style={styles.passwordRow}>
                 <TextInput
                   style={[styles.input, styles.passworInput]}
                   placeholder="Password"
@@ -174,7 +175,7 @@ export default function AddNewAccount() {
                     {hidePassword2 ? 'show' : 'hide'}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
 
               <TouchableOpacity
                 style={styles.button}
