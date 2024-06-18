@@ -15,6 +15,15 @@ export interface ICreatePlant {
   gardenId: string;
 }
 
+export interface IAccount {
+  id: string;
+  name: string;
+  username: string;
+  password: string;
+  phoneNumber: string;
+  email: string;
+}
+
 export interface IPlantDetails extends ISimplePlant, ICreatePlant {}
 
 export interface IGardenDetails extends ISimpleGarden {

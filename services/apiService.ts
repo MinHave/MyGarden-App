@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { credentials, inOptions } from '@/types/apiService';
 import {
+  IAccount,
   ICreatePlant,
   IGardenDetails,
   IPlantDetails,
@@ -179,6 +180,9 @@ const service = {
   },
   async resetPassword(username: string): Promise<ApiResponse<any>> {
     return postJsonString('auth/resetPassword', username, { noAuth: true });
+  },
+  async registerUser(user: IAccount): Promise<ApiResponse<ICurrentUser>> {
+    return put(`auth/register`, user, { noAuth: true });
   },
   //#endregion Auth
 

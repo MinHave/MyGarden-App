@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import { StackActions, TabActions } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -24,6 +25,23 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
   const [getPassword, setPassword] = useState('P@ssw0rd');
   const [getHidePassword, setHidePassword] = useState(true);
   const [getLoading, setLoading] = useState(false);
+
+  const registerAccount = async () => {
+    navigation.dispatch(TabActions.jumpTo('createAccount'));
+  };
+
+  const forgotPassword = async () => {
+    if (getEmail) {
+      let response = await apiService.resetPassword(getEmail);
+      console.log('response', response);
+    } else {
+      Alert.alert(
+        'Write your email',
+        'Email must be written in the E-mail input field',
+        [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+      );
+    }
+  };
 
   const tryLogin = async () => {
     setLoading(true);
@@ -125,18 +143,14 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() =>
-                navigation.navigate('ChangePasswordComponent', {
-                  passedEmail: getEmail,
-                })
-              }
+              onPress={() => forgotPassword()}
             >
               <Text style={styles.buttonText}>Forgot password</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate('RegisterWithMitId')}
+              onPress={() => registerAccount()}
             >
               <Text style={styles.buttonText}>Create user</Text>
             </TouchableOpacity>
