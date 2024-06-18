@@ -125,7 +125,9 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
               <TouchableOpacity
                 onPress={() => setHidePassword(!getHidePassword)}
               >
-                <Text>{getHidePassword ? 'Show' : 'Hide'}</Text>
+                <Text style={{ color: '#FFF', minWidth: 50 }}>
+                  {getHidePassword ? 'Show' : 'Hide'}
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -168,6 +170,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   card: {
+    height: '100%',
     padding: 20,
     borderRadius: 10,
     backgroundColor: '#333', // Dark background color
@@ -187,6 +190,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
+    flex: 1,
     height: 50,
     borderColor: '#777', // Darker border color
     borderWidth: 1,
