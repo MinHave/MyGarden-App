@@ -65,6 +65,10 @@ export default function AddNewPlant() {
   };
   //Function to initialize data fetching
   const onStartup = async () => {
+    setPlantName('');
+    setPlantDescription('');
+    setPlantSpecie('');
+
     fetchGardenDetails();
   };
 
