@@ -21,7 +21,7 @@ interface LoginComponentProps {
 }
 
 const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
-  const [getEmail, setEmail] = useState('mgc@tavsogmatias.com');
+  const [getEmail, setEmail] = useState('matiasgrimm@gmail.com');
   const [getPassword, setPassword] = useState('P@ssw0rd');
   const [getHidePassword, setHidePassword] = useState(true);
   const [getLoading, setLoading] = useState(false);
@@ -33,7 +33,14 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
   const forgotPassword = async () => {
     if (getEmail) {
       let response = await apiService.resetPassword(getEmail);
-      console.log('response', response);
+
+      if (response.success) {
+        Alert.alert(
+          'Reset password',
+          `A mail has been sent to ${getEmail} with a link to reset your password`,
+          [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+        );
+      }
     } else {
       Alert.alert(
         'Write your email',
@@ -56,8 +63,6 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ navigation }) => {
         apiService,
       });
       if (result != null) {
-        // const result = await apiService.login(data);
-        console.log('Login result:', result);
         const resultData = result.data as ICurrentUser;
         if (!result.success) {
           setLoading(false);
