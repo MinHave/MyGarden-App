@@ -95,19 +95,7 @@ export default function PlantsList() {
 
       {/* Card */}
       {getPlant != null ? (
-        <View style={[styles.card, styles.cardPadding]}>
-          <View>
-            {/* Header */}
-            <View style={styles.header}>
-              <Text style={styles.title}>{getPlant.name}</Text>
-              <Text style={styles.subtitle}>{getPlant.specie}</Text>
-            </View>
-
-            {/* Content */}
-            <View style={styles.content}>
-              <Text style={styles.text}>{getPlant.description}</Text>
-            </View>
-          </View>
+        <View style={[styles.card]}>
           <View
             style={{
               width: '100%',
@@ -122,10 +110,23 @@ export default function PlantsList() {
                 alignSelf: 'flex-start',
                 paddingVertical: 8,
                 borderRadius: 4,
+                margin: 5,
               }}
             >
               <Text style={{ color: '#fff', textAlign: 'center' }}>DELETE</Text>
             </TouchableOpacity>
+          </View>
+          <View style={styles.cardPadding}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.title}>{getPlant.name}</Text>
+              <Text style={styles.subtitle}>{getPlant.specie}</Text>
+            </View>
+
+            {/* Content */}
+            <View style={styles.content}>
+              <Text style={styles.text}>{getPlant.description}</Text>
+            </View>
           </View>
         </View>
       ) : null}
@@ -141,7 +142,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 14,
-    marginTop: 10,
     backgroundColor: '#555', // Darker button background
   },
   buttonPrimary: {
@@ -160,20 +160,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   cardPadding: {
-    padding: 16,
-    // justifyContent: 'center',
+    height: '100%',
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#333',
   },
   card: {
     flex: 1,
     backgroundColor: '#555',
-    borderRadius: 15,
     shadowColor: 'black',
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    justifyContent: 'space-between', // Add this line
+    // justifyContent: 'space-between', // Add this line
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 14,
